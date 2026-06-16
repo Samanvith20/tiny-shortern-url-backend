@@ -2,7 +2,7 @@ import rateLimit from "express-rate-limit";
 
 export const createUrlLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
-  max: 20,
+  max: 3,
   standardHeaders: true,
   legacyHeaders: false,
 
