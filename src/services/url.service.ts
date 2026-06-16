@@ -3,11 +3,7 @@ import { getNextSequence } from "./counter.service.js";
 import { encodeBase62 } from "../utils/base62.js";
 import Click from "../models/click.model.js";
 
-type ShortUrlData = {
-  urlId: number;
-  code: string;
-  originalUrl: string;
-};
+
 export const createShortUrl = async (originalUrl: string) => {
   const existingUrl = await Url.findOne({
     originalUrl,
@@ -25,14 +21,14 @@ export const createShortUrl = async (originalUrl: string) => {
   const code = encodeBase62(sequence);
 
   const url = await Url.create({
-    urlId: sequence,
+
     code,
     originalUrl,
   });
 
   return {
-    code: url.code,
-    originalUrl: url.originalUrl,
+    code: url.code as string,
+    originalUrl: url.originalUrl as string,
   };
 };
 
