@@ -7,11 +7,12 @@ import {
 } from "../services/url.service.js";
 import { AppError } from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import { getDeviceType } from "../utils/device.js";
 
-export const createUrl = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-
+export const createUrl = asyncHandler(
+  async (req: Request, res: Response): Promise<Response> => {
     const validatedData = createUrlSchema.parse(req.body);
-         
+
     const data = await createShortUrl(validatedData.url);
 
     return res.status(201).json({
@@ -21,31 +22,34 @@ export const createUrl = asyncHandler(async (req: Request, res: Response): Promi
         shortUrl: `${req.protocol}://${req.get("host")}/${data.code}`,
       },
     });
-  
-});
+  },
+);
 
-export const redirectToUrl = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-  const { code } = req.params;
+export const redirectToUrl = asyncHandler(
+  async (req: Request, res: Response): Promise<void> => {
+    const { code } = req.params;
 
-  const originalUrl = await getOriginalUrl(
-    code as string,
-    req.headers["user-agent"] || "unknown",
-    req.get("referer") || "direct",
-  );
+    const originalUrl = await getOriginalUrl(
+      code as string,
+      getDeviceType(String(req.headers["user-agent"] || "")),
+      req.get("referer") || "direct",
+    );
 
-  if (!originalUrl) {
-    throw new AppError("URL Invalid", 404); 
-  }
+    if (!originalUrl) {
+      throw new AppError("URL Invalid", 404);
+    }
 
-      return res.redirect(302, originalUrl);
-});
+    return res.redirect(302, originalUrl);
+  },
+);
 
-export const getAllUrls = asyncHandler(async (req: Request, res: Response): Promise<Response> => {
-  const urls = await getUrls();
+export const getAllUrls = asyncHandler(
+  async (req: Request, res: Response): Promise<Response> => {
+    const urls = await getUrls();
 
-  return res.status(200).json({
-    success: true,
-    data: urls,
-  });
-
-});
+    return res.status(200).json({
+      success: true,
+      data: urls,
+    });
+  },
+);
